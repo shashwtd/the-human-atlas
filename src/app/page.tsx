@@ -1,103 +1,78 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import { dummyEmotions } from '@/data/emotions';
+import EmotionDisplay from '@/components/EmotionDisplay';
+import ShareYourDay from '@/components/ShareYourDay';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [activeTab, setActiveTab] = useState<'share' | 'explore'>('explore');
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  return (
+    <main className="w-full min-h-screen pt-12">
+      {/* Hero Section */}
+      <section className="px-4 py-16 text-center border-b border-foreground/20">
+        <h1 className="font-mono text-4xl md:text-6xl font-bold text-foreground mb-6">
+          THE HUMAN ATLAS
+        </h1>
+        <p className="font-sans text-lg md:text-xl text-foreground/80 mb-4 max-w-3xl mx-auto">
+          A COLLECTIVE LIBRARY OF HUMAN EMOTIONS
+        </p>
+        <p className="font-mono text-sm text-foreground/60 max-w-2xl mx-auto leading-relaxed">
+          Map your emotional landscape. Share your daily experience. Explore the universal human condition through authentic stories.
+        </p>
+        
+        {/* Privacy Notice */}
+        <div className="mt-8 p-4 border border-foreground/30 bg-foreground/5 max-w-2xl mx-auto">
+          <p className="font-mono text-xs text-foreground/70">
+            <span className="text-green-400">●</span> COMPLETELY ANONYMOUS — Your privacy is our priority. No personal data is collected or stored.
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </section>
+
+      {/* Tab Navigation */}
+      <section className="px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex border border-foreground/30">
+            <button
+              onClick={() => setActiveTab('explore')}
+              className={`flex-1 py-4 px-6 font-mono font-medium transition-all ${
+                activeTab === 'explore'
+                  ? 'bg-foreground text-background border-r border-foreground/30'
+                  : 'bg-transparent text-foreground hover:bg-foreground/10 border-r border-foreground/30'
+              }`}
+            >
+              EXPLORE EMOTIONS [{dummyEmotions.length}]
+            </button>
+            <button
+              onClick={() => setActiveTab('share')}
+              className={`flex-1 py-4 px-6 font-mono font-medium transition-all ${
+                activeTab === 'share'
+                  ? 'bg-foreground text-background'
+                  : 'bg-transparent text-foreground hover:bg-foreground/10'
+              }`}
+            >
+              SHARE YOUR DAY
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Content Sections */}
+      {activeTab === 'explore' && <EmotionDisplay emotions={dummyEmotions} />}
+      {activeTab === 'share' && <ShareYourDay />}
+
+      {/* Footer */}
+      <footer className="border-t border-foreground/20 px-4 py-8">
+        <div className="max-w-6xl mx-auto text-center">
+          <p className="font-mono text-sm text-foreground/60">
+            THE HUMAN ATLAS — Mapping emotions across the human experience
+          </p>
+          <p className="font-mono text-xs text-foreground/40 mt-2">
+            A place for authentic connection through shared emotional experiences
+          </p>
+        </div>
       </footer>
-    </div>
+    </main>
   );
 }

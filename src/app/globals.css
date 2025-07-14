@@ -1,10 +1,73 @@
 @import "tailwindcss";
 
 :root {
+  /* Base Theme Colors */
   --background: #38342d;
   --foreground: #cfb885;
-}
 
+  /* Color Variations */
+  --foreground-muted: rgba(207, 184, 133, 0.6);
+  --foreground-subtle: rgba(207, 184, 133, 0.2);
+  
+  /* Border Colors */
+  --border-primary: rgba(207, 184, 133, 0.3);
+  --border-secondary: rgba(207, 184, 133, 0.2);
+  --border-hover: var(--foreground);
+  
+  /* Interactive Elements */
+  --hover-bg: rgba(207, 184, 133, 0.1);
+  --active-bg: rgba(207, 184, 133, 0.15);
+  --button-bg: var(--foreground);
+  --button-text: var(--background);
+  --button-hover-bg: rgba(207, 184, 133, 0.9);
+  
+  /* Form Elements */
+  --input-border: rgba(207, 184, 133, 0.3);
+  --input-bg: rgba(56, 52, 45, 0.5);
+  --input-focus-border: var(--foreground);
+  --input-placeholder: rgba(207, 184, 133, 0.4);
+  
+  /* Slider */
+  --slider-thumb: var(--foreground);
+  --slider-track: rgba(207, 184, 133, 0.3);
+  
+  /* Mood Colors */
+  --mood-excellent-border: rgb(74, 222, 128);
+  --mood-excellent-bg: rgba(74, 222, 128, 0.1);
+  --mood-good-border: rgb(96, 165, 250);
+  --mood-good-bg: rgba(96, 165, 250, 0.1);
+  --mood-neutral-border: rgb(234, 179, 8);
+  --mood-neutral-bg: rgba(234, 179, 8, 0.1);
+  --mood-difficult-border: rgb(249, 115, 22);
+  --mood-difficult-bg: rgba(249, 115, 22, 0.1);
+  --mood-challenging-border: rgb(239, 68, 68);
+  --mood-challenging-bg: rgba(239, 68, 68, 0.1);
+  
+  /* Typography */
+  --text-primary: var(--foreground);
+  --text-secondary: rgba(207, 184, 133, 0.8);
+  --text-muted: rgba(207, 184, 133, 0.6);
+  
+  /* Overlays */
+  --overlay-light: rgba(207, 184, 133, 0.05);
+  --overlay-medium: rgba(207, 184, 133, 0.1);
+  --overlay-heavy: rgba(207, 184, 133, 0.2);
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+  
+  /* Z-index layers */
+  --z-header: 100;
+  --z-modal: 200;
+  --z-tooltip: 300;
+}
 
 @theme inline {
   --font-sans: var(--font-geist-sans);
@@ -15,10 +78,43 @@
 }
 
 body {
-  background: var(--background);
-  background-image: url('/noise.webp');
   background-repeat: repeat;
-  background-blend-mode: overlay;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+
+  @apply bg-neutral-900;
+  background-image: url('/noise.webp');
+  background-blend-mode: overlay;
+
+}
+
+/* Custom slider styles */
+.slider {
+  -webkit-appearance: none;
+  background: var(--slider-track);
+  opacity: 0.3;
+  transition: opacity 0.2s;
+}
+
+.slider:hover {
+  opacity: 0.7;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--slider-thumb);
+  cursor: pointer;
+  border: 2px solid var(--background);
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: var(--slider-thumb);
+  cursor: pointer;
+  border: 2px solid var(--background);
+  border-radius: 0;
 }
