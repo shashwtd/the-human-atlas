@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💟 THE HUMAN ATLAS
 
-## Getting Started
+**THE HUMAN ATLAS** is a digital library consisting of books that have their own emotion. Users can log their entries and they get processed through local LLMs that categorize the emotion they emit and then the entries are logged into the database. It's an interactive environment where you could browse various books and read them.
 
-First, run the development server:
+## 🚀 Features
+
+- TBA
+
+<div align="">
+  <a href="https://shipwrecked.hackclub.com/?t=ghrm" target="_blank">
+    <img src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/739361f1d440b17fc9e2f74e49fc185d86cbec14_badge.png" 
+         alt="This project is part of Shipwrecked, the world's first hackathon on an island!" 
+         style="width: 35%;">
+  </a>
+</div>
+
+## 🛠️ Tech Stack
+
+- [Next.js](https://nextjs.org/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [Gemini](https://ai.google.dev)
+- [Supabase](https://supabase.com)
+
+## 🧑‍💻 Local Setup Instructions
+
+> Ensure you have Node.js and pnpm/yarn/npm installed.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Clone the repository
+git clone https://github.com/shashwtd/the-human-atlas.git
+cd the-human-atlas
+
+# Install dependencies
+pnpm install
+
+# Run the dev server
 pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Open in browser
+http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Inspirations / Resources
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**For 3d book flip animation**
+- https://dearflip.com
+- https://real3dflipbook.com/#style_16
+- https://3dflipbook.net
