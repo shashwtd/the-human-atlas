@@ -16,7 +16,7 @@ export default function Header() {
                         href="/demo"
                         className="text-black font-mono font-medium px-5 h-full items-center flex hover:text-foreground hover:bg-background hover:border hover:border-foreground border-x"
                     >
-                        Demo
+                        About Project
                     </Link>
                     <Link
                         href="/how-it-works"

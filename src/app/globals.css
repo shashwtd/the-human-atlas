@@ -87,6 +87,15 @@ body {
     background-blend-mode: overlay;
 }
 
+select {
+    cursor: pointer;
+}
+
+select option {
+    color: var(--foreground);
+    background-color: var(--background);
+}
+
 /* Custom slider styles */
 .slider {
     -webkit-appearance: none;

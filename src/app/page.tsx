@@ -12,24 +12,32 @@ export default function Home() {
         <main className="w-full min-h-screen pt-12">
             {/* Hero Section */}
             <section className="px-4 py-16 text-center border-b border-foreground/20">
+
+                <p className="font-sans text-lg md:text-xl text-foreground/80 mb-4 max-w-3xl mx-auto">
+                    A COLLECTIVE LIBRARY OF HUMAN EMOTIONS
+            </p>
                 <h1 className="font-mono text-4xl md:text-6xl font-bold text-foreground mb-6">
                     THE HUMAN ATLAS
                 </h1>
-                <p className="font-sans text-lg md:text-xl text-foreground/80 mb-4 max-w-3xl mx-auto">
-                    A COLLECTIVE LIBRARY OF HUMAN EMOTIONS
-                </p>
-                <p className="font-mono text-sm text-foreground/60 max-w-2xl mx-auto leading-relaxed">
+                <p className="font-mono text-sm text-foreground/60 max-w-4xl mx-auto leading-relaxed">
                     Map your emotional landscape. Share your daily experience.
                     Explore the universal human condition through authentic
-                    stories.
+                    stories. The human atlas is a private, anonymous space to
+                    vent out your feelings, reflect on your day, and connect
+                    with others through shared emotional experiences.
                 </p>
 
                 {/* Privacy Notice */}
-                <div className="mt-8 p-4 border border-foreground/30 bg-foreground/5 max-w-2xl mx-auto">
-                    <p className="font-mono text-xs text-foreground/70">
-                        <span className="text-green-400">●</span> COMPLETELY
-                        ANONYMOUS — Your privacy is our priority. No personal
-                        data is collected or stored.
+                <div className="mt-8 p-4 border border-foreground/30 bg-foreground/5 max-w-xl mx-auto">
+                    <p className="font-mono flex flex-col items-center justify-center gap-3 text-xs text-foreground/70">
+                        <div>
+                            <span className="text-green-400">●</span> COMPLETELY
+                            ANONYMOUS
+                        </div>
+                        <div>
+                            Your privacy is our priority. No personal data is
+                            collected or stored.
+                        </div>
                     </p>
                 </div>
             </section>

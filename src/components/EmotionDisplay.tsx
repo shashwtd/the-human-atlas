@@ -59,7 +59,7 @@ export default function EmotionDisplay({ emotions }: EmotionDisplayProps) {
                                 <option value="">All emotions</option>
                                 {emotionCategories.map((emotion) => (
                                     <option key={emotion} value={emotion}>
-                                        {emotion}
+                                        {emotion.charAt(0).toUpperCase() + emotion.slice(1)}
                                     </option>
                                 ))}
                             </select>
@@ -84,10 +84,19 @@ export default function EmotionDisplay({ emotions }: EmotionDisplayProps) {
                                 }}
                             >
                                 <option value="">Any rating</option>
-                                <option value="8">8+ (Great days)</option>
-                                <option value="6">6+ (Good days)</option>
-                                <option value="4">4+ (Okay days)</option>
-                                <option value="1">1+ (All days)</option>
+                                {[
+                                    { value: "8", label: "8+ (Great days)" },
+                                    { value: "6", label: "6+ (Good days)" },
+                                    { value: "4", label: "4+ (Okay days)" },
+                                    { value: "1", label: "1+ (All days)" },
+                                ].map((rating) => (
+                                    <option
+                                        key={rating.value}
+                                        value={rating.value}
+                                    >
+                                        {rating.label}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div>
@@ -105,16 +114,22 @@ export default function EmotionDisplay({ emotions }: EmotionDisplayProps) {
                                 className="w-full p-3 bg-background border border-foreground/30 text-foreground font-mono focus:border-foreground focus:outline-none"
                                 style={{
                                     backgroundColor: "var(--filter-bg-color)",
-                                    color: "var(--filter-text-color)",
                                     borderColor: "var(--filter-border-color)",
                                 }}
                             >
                                 <option value="">All moods</option>
-                                <option value="excellent">Excellent</option>
-                                <option value="good">Good</option>
-                                <option value="neutral">Neutral</option>
-                                <option value="difficult">Difficult</option>
-                                <option value="challenging">Challenging</option>
+                                {[
+                                    "excellent",
+                                    "good",
+                                    "neutral",
+                                    "difficult",
+                                    "challenging",
+                                ].map((mood) => (
+                                    <option key={mood} value={mood}>
+                                        {mood.charAt(0).toUpperCase() +
+                                            mood.slice(1)}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>
