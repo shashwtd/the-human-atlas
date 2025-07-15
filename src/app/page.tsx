@@ -29,7 +29,7 @@ export default function Home() {
 
                 {/* Privacy Notice */}
                 <div className="mt-8 p-4 border border-foreground/30 bg-foreground/5 max-w-xl mx-auto">
-                    <p className="font-mono flex flex-col items-center justify-center gap-3 text-xs text-foreground/70">
+                    <div className="font-mono flex flex-col items-center justify-center gap-3 text-xs text-foreground/70">
                         <div>
                             <span className="text-green-400">●</span> COMPLETELY
                             ANONYMOUS
@@ -38,7 +38,7 @@ export default function Home() {
                             Your privacy is our priority. No personal data is
                             collected or stored.
                         </div>
-                    </p>
+                    </div>
                 </div>
             </section>
 

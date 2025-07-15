@@ -13,7 +13,7 @@ export default function Header() {
                 </Link>
                 <nav className="flex items-center h-full border-l">
                     <Link
-                        href="/demo"
+                        href="/about-project"
                         className="text-black font-mono font-medium px-5 h-full items-center flex hover:text-foreground hover:bg-background hover:border hover:border-foreground border-x"
                     >
                         About Project
