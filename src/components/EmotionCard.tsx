@@ -3,6 +3,7 @@
 import { EmotionEntry } from "@/data/emotions";
 import { emotionIcons } from "@/data/emotion-icons";
 import { MapPin } from "lucide-react";
+import { useState } from "react";
 import * as React from "react";
 
 interface EmotionCardProps {
@@ -10,6 +11,8 @@ interface EmotionCardProps {
 }
 
 export default function EmotionCard({ emotion }: EmotionCardProps) {
+    const [isDetailedView, setIsDetailedView] = useState(false);
+
     const getMoodStyles = (mood: string) => {
         const styles = {
             border: "",
@@ -62,6 +65,7 @@ export default function EmotionCard({ emotion }: EmotionCardProps) {
     return (
         <>
             <div
+                onClick={() => setIsDetailedView(true)}
                 style={{
                     padding: "1.5rem",
                     border: `1px solid ${getMoodStyles(emotion.mood).border}`,
@@ -178,6 +182,132 @@ export default function EmotionCard({ emotion }: EmotionCardProps) {
             </div>
 
             {/* Detailed View Modal */}
+            {isDetailedView && (
+                <div
+                    className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="emotion-modal-title"
+                >
+                    <div
+                        className="bg-background max-w-2xl w-full mx-4 rounded-lg overflow-hidden"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div
+                            style={{
+                                padding: "2rem",
+                                border: `1px solid ${getMoodStyles(emotion.mood).border}`,
+                                background: getMoodStyles(emotion.mood).background,
+                            }}
+                        >
+                            <div className="flex justify-between items-start mb-6">
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        {emotionIcons[emotion.primaryEmotion] && (
+                                            <div className="text-[var(--text-primary)]">
+                                                {React.createElement(
+                                                    emotionIcons[emotion.primaryEmotion],
+                                                    { size: 24 }
+                                                )}
+                                            </div>
+                                        )}
+                                        <span
+                                            style={{ color: "var(--text-primary)" }}
+                                            className="font-mono text-xl font-bold"
+                                        >
+                                            {emotion.primaryEmotion.toUpperCase()}
+                                        </span>
+                                        <span
+                                            style={{ color: "var(--text-muted)" }}
+                                            className="text-sm font-mono"
+                                        >
+                                            {emotion.dayRating}/10
+                                        </span>
+                                    </div>
+                                    <h3
+                                        id="emotion-modal-title"
+                                        style={{ color: "var(--text-primary)" }}
+                                        className="font-sans text-2xl font-semibold mb-4"
+                                    >
+                                        {emotion.title}
+                                    </h3>
+                                </div>
+                                <button
+                                    onClick={() => setIsDetailedView(false)}
+                                    className="text-foreground/60 hover:text-foreground font-semibold cursor-pointer bg-white/5 px-4 py-2 hover:border"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            <div className="mb-4 flex gap-2">
+                                <span
+                                    className={`text-xs font-mono px-3 py-1 rounded-full ${
+                                        emotion.dayRating >= 8
+                                            ? "bg-[var(--mood-excellent-bg)] text-[var(--mood-excellent-border)]"
+                                            : emotion.dayRating >= 6
+                                            ? "bg-[var(--mood-good-bg)] text-[var(--mood-good-border)]"
+                                            : emotion.dayRating >= 4
+                                            ? "bg-[var(--mood-neutral-bg)] text-[var(--mood-neutral-border)]"
+                                            : "bg-[var(--mood-difficult-bg)] text-[var(--mood-difficult-border)]"
+                                    }`}
+                                >
+                                    {emotion.dayRating >= 8
+                                        ? "Great day"
+                                        : emotion.dayRating >= 6
+                                        ? "Good day"
+                                        : emotion.dayRating >= 4
+                                        ? "Okay day"
+                                        : "Tough day"}
+                                </span>
+                                <span className="text-xs font-mono px-3 py-1 rounded-full bg-foreground/5 text-foreground/60">
+                                    {formatDate(emotion.timestamp)}
+                                </span>
+                            </div>
+
+                            <p
+                                style={{ color: "var(--text-secondary)" }}
+                                className="font-sans text-base leading-relaxed mb-6"
+                            >
+                                {emotion.description}
+                            </p>
+
+                            {emotion.significantEvents.length > 0 && (
+                                <div className="mb-6">
+                                    <p className="font-mono text-xs text-foreground/60 mb-2">
+                                        KEY MOMENTS:
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {emotion.significantEvents.map((event, idx) => (
+                                            <span
+                                                key={idx}
+                                                className="px-3 py-1.5 text-sm font-mono bg-foreground/10 border border-foreground/20 text-foreground/80"
+                                            >
+                                                {event}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="flex flex-wrap gap-2 text-sm font-mono text-foreground/60 mt-6 pt-4 border-t border-foreground/20">
+                                {emotion.location && (
+                                    <div className="flex items-center gap-1.5">
+                                        <MapPin size={14} className="" />
+                                        <span>{emotion.location}</span>
+                                    </div>
+                                )}
+                                <div className="flex-1" />
+                                {emotion.weather && (
+                                    <span className="text-sm font-mono rounded-full">
+                                        {emotion.weather}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
