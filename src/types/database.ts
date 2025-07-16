@@ -126,3 +126,104 @@ CREATE INDEX idx_users_region ON users(region);
 
 
 */
+
+
+
+// AND FOR ADDING RLS TO THE DATABASE:
+// WE TAKE THE FOLLOWING GIVEN APPROACH.
+
+
+/*
+
+
+-- Enable Row Level Security
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE emotions ENABLE ROW LEVEL SECURITY;
+
+-- Allow users to see their own profile only
+CREATE POLICY users_view_own ON users
+    FOR SELECT
+    USING (
+        auth.uid() = id
+        OR 
+        -- Allow fetching minimal user info for displaying posts
+        EXISTS (
+            SELECT 1 FROM emotions 
+            WHERE emotions.username = users.username
+        )
+    );
+
+-- Allow users to update their own profile
+CREATE POLICY users_update_own ON users
+    FOR UPDATE
+    USING (auth.uid() = id);
+
+-- Allow users to delete their own account
+CREATE POLICY users_delete_own ON users
+    FOR DELETE
+    USING (auth.uid() = id);
+
+-- Emotions table policies
+-- Anyone can view emotions (they're public)
+CREATE POLICY emotions_view_all ON emotions
+    FOR SELECT
+    TO authenticated
+    USING (true);
+
+-- Users can only insert their own emotions
+CREATE POLICY emotions_insert_own ON emotions
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (
+        username = (
+            SELECT username 
+            FROM users 
+            WHERE id = auth.uid()
+        )
+    );
+
+-- Users can only update their own emotions
+CREATE POLICY emotions_update_own ON emotions
+    FOR UPDATE
+    TO authenticated
+    USING (
+        username = (
+            SELECT username 
+            FROM users 
+            WHERE id = auth.uid()
+        )
+    );
+
+-- Users can only delete their own emotions
+CREATE POLICY emotions_delete_own ON emotions
+    FOR DELETE
+    TO authenticated
+    USING (
+        username = (
+            SELECT username 
+            FROM users 
+            WHERE id = auth.uid()
+        )
+    );
+
+-- Prevent users from changing their username if they have existing posts
+CREATE OR REPLACE FUNCTION check_username_change()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF OLD.username != NEW.username AND EXISTS (
+        SELECT 1 FROM emotions WHERE username = OLD.username
+    ) THEN
+        RAISE EXCEPTION 'Cannot change username with existing posts';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER prevent_username_change
+    BEFORE UPDATE ON users
+    FOR EACH ROW
+    EXECUTE FUNCTION check_username_change();
+
+
+    
+*/
