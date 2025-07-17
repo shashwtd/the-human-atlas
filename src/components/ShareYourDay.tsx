@@ -26,6 +26,9 @@ export default function ShareYourDay() {
             | "challenging",
     });
 
+    // Track which fields are focused
+    const [focusedField, setFocusedField] = useState<string | null>(null);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user) {
@@ -200,8 +203,15 @@ export default function ShareYourDay() {
                                     title: e.target.value,
                                 })
                             }
+                            onFocus={() => setFocusedField('title')}
+                            onBlur={() => setFocusedField(null)}
                             className="w-full p-4 bg-background border border-foreground/30 text-foreground font-sans placeholder-foreground/40 focus:border-foreground focus:outline-none"
                         />
+                        {focusedField === 'title' && (
+                            <p className="mt-2 text-sm text-foreground/60 font-mono">
+                                Keep it concise (3-50 characters). This will be the headline of your story.
+                            </p>
+                        )}
                     </div>
 
                     {/* Description */}
@@ -220,8 +230,15 @@ export default function ShareYourDay() {
                                     description: e.target.value,
                                 })
                             }
+                            onFocus={() => setFocusedField('description')}
+                            onBlur={() => setFocusedField(null)}
                             className="w-full p-4 bg-background border border-foreground/30 text-foreground font-sans placeholder-foreground/40 focus:border-foreground focus:outline-none resize-vertical"
                         />
+                        {focusedField === 'description' && (
+                            <p className="mt-2 text-sm text-foreground/60 font-mono">
+                                Share your thoughts in at least 10 characters. Feel free to be as detailed as you&apos;d like.
+                            </p>
+                        )}
                     </div>
 
                     {/* Significant Events */}
@@ -239,8 +256,15 @@ export default function ShareYourDay() {
                                     significantEvents: e.target.value,
                                 })
                             }
+                            onFocus={() => setFocusedField('events')}
+                            onBlur={() => setFocusedField(null)}
                             className="w-full p-4 bg-background border border-foreground/30 text-foreground font-sans placeholder-foreground/40 focus:border-foreground focus:outline-none"
                         />
+                        {focusedField === 'events' && (
+                            <p className="mt-2 text-sm text-foreground/60 font-mono">
+                                List notable moments from your day, separated by commas. These will be displayed as tags.
+                            </p>
+                        )}
                     </div>
 
                     {/* Location & Weather */}
@@ -283,22 +307,32 @@ export default function ShareYourDay() {
 
                     {/* Submit Button */}
                     <div className="text-center pt-8">
-                        <button
-                            type="submit"
-                            disabled={isSubmitting || !user}
-                            className={`px-12 py-4 bg-foreground text-background font-mono font-semibold text-lg hover:bg-foreground/90 transition-colors border border-foreground ${
-                                (isSubmitting || !user) ? 'opacity-50 cursor-not-allowed' : ''
-                            }`}
-                        >
-                            {isSubmitting ? 'SHARING...' : 'SHARE YOUR STORY'}
-                        </button>
-                        <p className="mt-4 text-xs font-mono text-foreground/60">
-                            {!user ? (
-                                'Please sign in to share your story'
-                            ) : (
-                                'By sharing, you\'re contributing to a global understanding of human emotion.'
-                            )}
-                        </p>
+                        {!user ? (
+                            <div className="space-y-4">
+                                <p className="font-mono text-foreground/80">Sign in to share your story</p>
+                                <a 
+                                    href="/auth"
+                                    className="inline-block px-12 py-4 bg-foreground text-background font-mono font-semibold text-lg hover:bg-foreground/90 transition-colors border border-foreground"
+                                >
+                                    SIGN IN
+                                </a>
+                            </div>
+                        ) : (
+                            <>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className={`px-12 py-4 bg-foreground text-background font-mono font-semibold text-lg hover:bg-foreground/90 transition-colors border border-foreground ${
+                                        isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                                    }`}
+                                >
+                                    {isSubmitting ? 'SHARING...' : 'SHARE YOUR STORY'}
+                                </button>
+                                <p className="mt-4 text-xs font-mono text-foreground/60">
+                                    By sharing, you&apos;re contributing to a global understanding of human emotion.
+                                </p>
+                            </>
+                        )}
                     </div>
                 </form>
             </div>

@@ -62,6 +62,10 @@ export default function EmotionCard({ emotion }: EmotionCardProps) {
         return text.slice(0, maxLength).trim() + "...";
     };
 
+    React.useEffect(() => {
+        console.log("EmotionCard mounted:", emotion);
+    }, [emotion]);
+
     return (
         <>
             <div
@@ -77,6 +81,13 @@ export default function EmotionCard({ emotion }: EmotionCardProps) {
             >
                 <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
+                        {emotion.username && (
+                            <div className="mb-3">
+                                <span className="font-mono text-sm px-2 py-1 rounded bg-foreground/5 text-foreground/70">
+                                    @{emotion.username}
+                                </span>
+                            </div>
+                        )}
                         <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-3">
                                 <div className="flex items-center gap-2">
@@ -211,6 +222,13 @@ export default function EmotionCard({ emotion }: EmotionCardProps) {
                         >
                             <div className="flex justify-between items-start mb-6">
                                 <div className="flex-1">
+                                    {emotion.username && (
+                                        <div className="mb-4">
+                                            <span className="font-mono text-base px-3 py-1.5 rounded bg-foreground/5 text-foreground/70">
+                                                @{emotion.username}
+                                            </span>
+                                        </div>
+                                    )}
                                     <div className="flex items-center gap-3 mb-3">
                                         {emotionIcons[emotion.primaryEmotion] && (
                                             <div className="text-[var(--text-primary)]">

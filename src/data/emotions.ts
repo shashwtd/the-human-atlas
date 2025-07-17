@@ -1,4 +1,5 @@
 export interface EmotionEntry {
+    username?: string; // Optional username for the emotion entry
     id: string;
     dayRating: number; // 1-10 scale
     primaryEmotion: string;

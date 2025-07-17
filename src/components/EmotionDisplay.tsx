@@ -42,6 +42,7 @@ export default function EmotionDisplay({ emotions: initialEmotions }: EmotionDis
                 const formattedEmotions: EmotionEntry[] = (data as DBEmotionEntry[]).map(
                     (entry) => ({
                         id: entry.id,
+                        username: entry.username || undefined,
                         primaryEmotion: entry.primary_emotion,
                         title: entry.title,
                         description: entry.description,
