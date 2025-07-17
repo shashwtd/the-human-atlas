@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/lib/auth";
+import { Region } from "@/types/database";
+import toast from "react-hot-toast";
 import { emotionCategories } from "@/data/emotions";
 
 export default function ShareYourDay() {
+    const { user } = useAuth();
     // Form state for sharing emotions
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         dayRating: 5,
         primaryEmotion: "",
@@ -21,30 +26,67 @@ export default function ShareYourDay() {
             | "challenging",
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // In a real app, this would submit to a database
-        console.log("Emotion entry submitted:", formData);
-        alert(
-            "Thank you for sharing your emotional journey. Your entry helps build our collective understanding of human experience."
-        );
+        if (!user) {
+            toast.error("Please sign in to share your story");
+            return;
+        }
 
-        // Reset form
-        setFormData({
-            dayRating: 5,
-            primaryEmotion: "",
-            title: "",
-            description: "",
-            significantEvents: "",
-            location: "",
-            weather: "",
-            mood: "neutral" as
-                | "excellent"
-                | "good"
-                | "neutral"
-                | "difficult"
-                | "challenging",
-        });
+        try {
+            setIsSubmitting(true);
+
+            // Validate significant events
+            const eventsList = formData.significantEvents
+                ? formData.significantEvents
+                      .split("\n")
+                      .map((event) => event.trim())
+                      .filter((event) => event.length > 0)
+                : [];
+
+            const response = await fetch('/api/emotions', {
+                method: 'POST',
+                credentials: 'include', // Add this to include session cookie
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: formData.title,
+                    primaryEmotion: formData.primaryEmotion,
+                    description: formData.description,
+                    dayRating: formData.dayRating,
+                    mood: formData.mood,
+                    significantEvents: eventsList,
+                    weather: formData.weather || undefined,
+                    region: user.region as Region,
+                }),
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to share story');
+            }
+
+            // Clear form after successful submission
+            setFormData({
+                dayRating: 5,
+                primaryEmotion: "",
+                title: "",
+                description: "",
+                significantEvents: "",
+                location: "",
+                mood: "neutral",
+                weather: "",
+            });
+
+            toast.success("Successfully shared your story!");
+        } catch (error) {
+            console.error("Error sharing emotion:", error);
+            toast.error(error instanceof Error ? error.message : "Failed to share your story");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -102,38 +144,42 @@ export default function ShareYourDay() {
                                         primaryEmotion: e.target.value,
                                     })
                                 }
-                                className="w-full p-4 bg-background border border-foreground/30 text-foreground font-mono focus:border-foreground focus:outline-none"
+                                className="w-full p-4 bg-background border border-foreground/30 text-foreground font-sans focus:border-foreground focus:outline-none"
                             >
-                                <option value="">
-                                    Select your main emotion
-                                </option>
+                                <option value="">Select an emotion</option>
                                 {emotionCategories.map((emotion) => (
                                     <option key={emotion} value={emotion}>
-                                        {emotion}
+                                        {emotion.charAt(0).toUpperCase() + emotion.slice(1)}
                                     </option>
                                 ))}
                             </select>
                         </div>
                         <div>
                             <label className="block font-mono text-sm font-semibold text-foreground/80 mb-3">
-                                OVERALL MOOD
+                                OVERALL MOOD *
                             </label>
                             <select
+                                required
                                 value={formData.mood}
                                 onChange={(e) =>
                                     setFormData({
                                         ...formData,
-                                        mood: e.target
-                                            .value as typeof formData.mood,
+                                        mood: e.target.value as typeof formData.mood,
                                     })
                                 }
-                                className="w-full p-4 bg-background border border-foreground/30 text-foreground font-mono focus:border-foreground focus:outline-none"
+                                className="w-full p-4 bg-background border border-foreground/30 text-foreground font-sans focus:border-foreground focus:outline-none"
                             >
-                                <option value="excellent">Excellent</option>
-                                <option value="good">Good</option>
-                                <option value="neutral">Neutral</option>
-                                <option value="difficult">Difficult</option>
-                                <option value="challenging">Challenging</option>
+                                {[
+                                    "excellent",
+                                    "good",
+                                    "neutral",
+                                    "difficult",
+                                    "challenging",
+                                ].map((mood) => (
+                                    <option key={mood} value={mood}>
+                                        {mood.charAt(0).toUpperCase() + mood.slice(1)}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>
@@ -239,13 +285,19 @@ export default function ShareYourDay() {
                     <div className="text-center pt-8">
                         <button
                             type="submit"
-                            className="px-12 py-4 bg-foreground text-background font-mono font-semibold text-lg hover:bg-foreground/90 transition-colors border border-foreground"
+                            disabled={isSubmitting || !user}
+                            className={`px-12 py-4 bg-foreground text-background font-mono font-semibold text-lg hover:bg-foreground/90 transition-colors border border-foreground ${
+                                (isSubmitting || !user) ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                         >
-                            SHARE YOUR STORY
+                            {isSubmitting ? 'SHARING...' : 'SHARE YOUR STORY'}
                         </button>
                         <p className="mt-4 text-xs font-mono text-foreground/60">
-                            By sharing, you&apos;re contributing to a global
-                            understanding of human emotion.
+                            {!user ? (
+                                'Please sign in to share your story'
+                            ) : (
+                                'By sharing, you\'re contributing to a global understanding of human emotion.'
+                            )}
                         </p>
                     </div>
                 </form>

@@ -1,19 +1,70 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { EmotionEntry, emotionCategories } from "@/data/emotions";
 import EmotionCard from "./EmotionCard";
+import { DBEmotionEntry } from "@/types/database";
+import toast from "react-hot-toast";
 
 interface EmotionDisplayProps {
-    emotions: EmotionEntry[];
+    emotions?: EmotionEntry[];
 }
 
-export default function EmotionDisplay({ emotions }: EmotionDisplayProps) {
+export default function EmotionDisplay({ emotions: initialEmotions }: EmotionDisplayProps) {
+    const [emotions, setEmotions] = useState<EmotionEntry[]>(initialEmotions || []);
+    const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({
         emotion: "",
         rating: "",
         mood: "",
     });
+
+    // Fetch emotions from the API
+    useEffect(() => {
+        const fetchEmotions = async () => {
+            try {
+                const response = await fetch('/api/emotions');
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to fetch emotions');
+                }
+
+                const { emotions: data } = await response.json();
+
+                // If no data, it means the table is empty
+                if (!data || data.length === 0) {
+                    setEmotions([]);
+                    return;
+                }
+
+                // Convert DB entries to EmotionEntry format
+                const formattedEmotions: EmotionEntry[] = (data as DBEmotionEntry[]).map(
+                    (entry) => ({
+                        id: entry.id,
+                        primaryEmotion: entry.primary_emotion,
+                        title: entry.title,
+                        description: entry.description,
+                        dayRating: entry.day_rating,
+                        mood: entry.mood as EmotionEntry["mood"],
+                        significantEvents: entry.significant_events,
+                        timestamp: new Date(entry.created_at),
+                        weather: entry.weather || undefined,
+                        location: undefined, // We don't store specific locations
+                    })
+                );
+
+                setEmotions(formattedEmotions);
+            } catch (error) {
+                console.error("Error fetching emotions:", error);
+                toast.error(error instanceof Error ? error.message : "Failed to load emotions");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchEmotions();
+    }, []); // Fetch on mount
 
     // Filter emotions based on selected filters
     const filteredEmotions = useMemo(() => {
@@ -27,6 +78,18 @@ export default function EmotionDisplay({ emotions }: EmotionDisplayProps) {
             return emotionMatch && ratingMatch && moodMatch;
         });
     }, [emotions, filters]);
+
+    if (loading) {
+        return (
+            <section className="px-4 pb-16">
+                <div className="max-w-6xl mx-auto text-center py-16">
+                    <p className="font-mono text-foreground/60">
+                        Loading experiences...
+                    </p>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className="px-4 pb-16">
@@ -144,26 +207,34 @@ export default function EmotionDisplay({ emotions }: EmotionDisplayProps) {
 
                 {filteredEmotions.length === 0 && (
                     <div className="text-center py-16">
-                        <p className="font-mono text-foreground/60">
-                            No entries match your current filters.
-                        </p>
-                        <button
-                            onClick={() =>
-                                setFilters({
-                                    emotion: "",
-                                    rating: "",
-                                    mood: "",
-                                })
-                            }
-                            className="mt-4 px-6 py-2 border border-foreground/30 text-foreground font-mono hover:bg-foreground/10 transition-colors"
-                            style={{
-                                borderColor: "var(--button-border-color)",
-                                color: "var(--button-text-color)",
-                                backgroundColor: "var(--button-bg-color)",
-                            }}
-                        >
-                            CLEAR FILTERS
-                        </button>
+                        {emotions.length === 0 ? (
+                            <p className="font-mono text-foreground/60">
+                                No emotions recorded yet. Share your first emotion to get started!
+                            </p>
+                        ) : (
+                            <>
+                                <p className="font-mono text-foreground/60">
+                                    No entries match your current filters.
+                                </p>
+                                <button
+                                    onClick={() =>
+                                        setFilters({
+                                            emotion: "",
+                                            rating: "",
+                                            mood: "",
+                                        })
+                                    }
+                                    className="mt-4 px-6 py-2 border border-foreground/30 text-foreground font-mono hover:bg-foreground/10 transition-colors"
+                                    style={{
+                                        borderColor: "var(--button-border-color)",
+                                        color: "var(--button-text-color)",
+                                        backgroundColor: "var(--button-bg-color)",
+                                    }}
+                                >
+                                    CLEAR FILTERS
+                                </button>
+                            </>
+                        )}
                     </div>
                 )}
             </div>

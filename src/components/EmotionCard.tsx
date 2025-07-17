@@ -165,19 +165,28 @@ export default function EmotionCard({ emotion }: EmotionCardProps) {
                     </div>
                 )}
 
-                <div className="flex flex-wrap gap-2 text-xs font-mono text-foreground/60 mt-4 pt-4 border-t border-foreground/20">
-                    {emotion.location && (
-                        <div className="flex items-center gap-1.5">
-                            <MapPin size={12} className="" />
-                            <span>{emotion.location}</span>
-                        </div>
-                    )}
-                    <div className="flex-1" />
-                    {emotion.weather && (
-                        <span className="text-xs font-mono rounded-full ">
-                            {emotion.weather}
+                {/* Show location only if available */}
+                {emotion.location && (
+                    <div className="flex items-center gap-2 mt-4 text-sm text-foreground/60">
+                        <MapPin size={14} />
+                        <span>{emotion.location}</span>
+                    </div>
+                )}
+
+                {/* Entry metadata */}
+                <div className="mt-4 pt-4 border-t border-foreground/10">
+                    <div className="flex justify-between items-center text-xs text-foreground/60">
+                        <span>
+                            {emotion.timestamp.toLocaleDateString(undefined, {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                            })}
                         </span>
-                    )}
+                        {emotion.weather && (
+                            <span className="font-mono">{emotion.weather}</span>
+                        )}
+                    </div>
                 </div>
             </div>
 
