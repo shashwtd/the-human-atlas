@@ -3,9 +3,18 @@ import { Region } from '@/types/database';
 
 const fallbackRegion: Region = 'Unknown';
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
-        const response = await fetch('https://ipapi.co/json/', {
+        // Get the client's IP address from request headers
+        const forwardedFor = request.headers.get('x-forwarded-for');
+        const clientIp = forwardedFor ? forwardedFor.split(',')[0] : request.headers.get('x-real-ip');
+        
+        if (!clientIp) {
+            console.warn('Could not detect client IP address');
+            return NextResponse.json({ region: fallbackRegion });
+        }
+
+        const response = await fetch(`https://ipapi.co/${clientIp}/json/`, {
             headers: {
                 'Accept': 'application/json',
                 'User-Agent': 'The Human Atlas/1.0'
