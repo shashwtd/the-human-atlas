@@ -74,10 +74,11 @@ export default function EmotionCard({ emotion }: EmotionCardProps) {
                     padding: "1.5rem",
                     border: `1px solid ${getMoodStyles(emotion.mood).border}`,
                     background: getMoodStyles(emotion.mood).background,
-                    transition: "var(--transition-normal)",
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                     cursor: "pointer",
+                    transform: "translateY(0)",
                 }}
-                className="hover:border-[var(--border-hover)] hover:shadow-md"
+                className="hover:border-[var(--border-hover)] hover:shadow-lg hover:-translate-y-1 hover:shadow-foreground/5"
             >
                 <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">

@@ -45,7 +45,7 @@ export default function Header() {
                             </span>
                             <button
                                 onClick={signOut}
-                                className="text-black font-mono font-medium px-5 h-full items-center flex hover:text-foreground hover:bg-background hover:border hover:border-foreground"
+                                className="text-black cursor-pointer font-mono font-medium px-5 h-full items-center flex hover:text-foreground hover:bg-background hover:border hover:border-foreground"
                             >
                                 <LogOut size={14} className="mr-2" />
                                 Sign out
