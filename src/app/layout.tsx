@@ -34,7 +34,41 @@ export default function RootLayout({
           <div className="flex flex-col min-h-screen">
             <Header />
             {children}
-            <Toaster position="bottom-right" />
+            <Toaster 
+              position="bottom-right"
+              toastOptions={{
+                duration: 5000,
+                style: {
+                  background: 'var(--background)',
+                  color: 'var(--foreground)',
+                  border: '1px solid rgba(var(--foreground-rgb), 0.2)',
+                  padding: '16px 24px',
+                  fontSize: '14px',
+                  fontFamily: 'var(--font-geist-mono)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                },
+                success: {
+                  style: {
+                    border: '1px solid var(--mood-excellent-border)',
+                    background: 'var(--mood-excellent-bg)',
+                  },
+                  iconTheme: {
+                    primary: 'var(--mood-excellent-border)',
+                    secondary: 'var(--background)',
+                  },
+                },
+                error: {
+                  style: {
+                    border: '1px solid var(--mood-difficult-border)',
+                    background: 'var(--mood-difficult-bg)',
+                  },
+                  iconTheme: {
+                    primary: 'var(--mood-difficult-border)',
+                    secondary: 'var(--background)',
+                  },
+                },
+              }}
+            />
           </div>
         </AuthProvider>
       </body>
