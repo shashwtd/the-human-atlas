@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { Region } from "@/types/database";
 import toast from "react-hot-toast";
@@ -10,24 +10,79 @@ export default function ShareYourDay() {
     const { user } = useAuth();
     // Form state for sharing emotions
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [formData, setFormData] = useState({
-        dayRating: 5,
-        primaryEmotion: "",
-        title: "",
-        description: "",
-        significantEvents: "",
-        location: "",
-        weather: "",
-        mood: "neutral" as
-            | "excellent"
-            | "good"
-            | "neutral"
-            | "difficult"
-            | "challenging",
+    const [hasInteracted, setHasInteracted] = useState(false);
+    const [formData, setFormData] = useState(() => {
+        // Try to load saved form data from localStorage
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('savedStoryDraft');
+            if (saved) {
+                try {
+                    return JSON.parse(saved);
+                } catch (e) {
+                    console.error('Failed to parse saved story draft', e);
+                }
+            }
+        }
+        return {
+            dayRating: 5,
+            primaryEmotion: "",
+            title: "",
+            description: "",
+            significantEvents: "",
+            location: "",
+            weather: "",
+            mood: "neutral" as
+                | "excellent"
+                | "good"
+                | "neutral"
+                | "difficult"
+                | "challenging",
+        };
     });
 
     // Track which fields are focused
     const [focusedField, setFocusedField] = useState<string | null>(null);
+
+    // Save form data to localStorage whenever it changes
+    useEffect(() => {
+        if (hasInteracted) {
+            localStorage.setItem('savedStoryDraft', JSON.stringify(formData));
+        }
+    }, [formData, hasInteracted]);
+
+    // Function to handle any form field change
+    const handleFieldChange = (field: string, value: string | number | boolean) => {
+        if (!hasInteracted) {
+            setHasInteracted(true);
+            if (!user) {
+                toast.custom((t) => (
+                    <div className="bg-background border border-foreground/20 px-6 py-4 shadow-lg rounded-lg">
+                        <p className="font-mono text-foreground mb-2">Not signed in</p>
+                        <p className="text-sm text-foreground/70 mb-3">
+                            You&apos;ll need to sign in to share your story, but don&apos;t worry - we&apos;ll save your draft.
+                        </p>
+                        <div className="flex gap-3">
+                            <a 
+                                href="/auth"
+                                className="px-4 py-2 bg-foreground text-background text-sm font-mono hover:bg-foreground/90 transition-colors"
+                            >
+                                Sign in now
+                            </a>
+                            <button 
+                                onClick={() => toast.dismiss(t.id)}
+                                className="px-4 py-2 border border-foreground/20 text-sm font-mono hover:bg-foreground/5 transition-colors"
+                            >
+                                Continue writing
+                            </button>
+                        </div>
+                    </div>
+                ), {
+                    duration: 8000,
+                });
+            }
+        }
+        setFormData((prev: FormData) => ({ ...prev, [field]: value }));
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,8 +98,8 @@ export default function ShareYourDay() {
             const eventsList = formData.significantEvents
                 ? formData.significantEvents
                       .split("\n")
-                      .map((event) => event.trim())
-                      .filter((event) => event.length > 0)
+                      .map((event: string) => event.trim())
+                      .filter((event: string) => event.length > 0)
                 : [];
 
             const response = await fetch('/api/emotions', {
@@ -71,8 +126,8 @@ export default function ShareYourDay() {
                 throw new Error(data.error || 'Failed to share story');
             }
 
-            // Clear form after successful submission
-            setFormData({
+            // Clear form and saved draft after successful submission
+            const defaultFormData = {
                 dayRating: 5,
                 primaryEmotion: "",
                 title: "",
@@ -81,7 +136,10 @@ export default function ShareYourDay() {
                 location: "",
                 mood: "neutral",
                 weather: "",
-            });
+            };
+            setFormData(defaultFormData);
+            localStorage.removeItem('savedStoryDraft');
+            setHasInteracted(false);
 
             toast.success("Successfully shared your story!");
         } catch (error) {
@@ -117,12 +175,7 @@ export default function ShareYourDay() {
                             min="1"
                             max="10"
                             value={formData.dayRating}
-                            onChange={(e) =>
-                                setFormData({
-                                    ...formData,
-                                    dayRating: parseInt(e.target.value),
-                                })
-                            }
+                            onChange={(e) => handleFieldChange('dayRating', parseInt(e.target.value))}
                             className="w-full h-2 bg-foreground/20 appearance-none cursor-pointer slider"
                         />
                         <div className="flex justify-between text-xs font-mono text-foreground/60 mt-2">
@@ -141,12 +194,7 @@ export default function ShareYourDay() {
                             <select
                                 required
                                 value={formData.primaryEmotion}
-                                onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        primaryEmotion: e.target.value,
-                                    })
-                                }
+                                onChange={(e) => handleFieldChange('primaryEmotion', e.target.value)}
                                 className="w-full p-4 bg-background border border-foreground/30 text-foreground font-sans focus:border-foreground focus:outline-none"
                             >
                                 <option value="">Select an emotion</option>
@@ -164,12 +212,7 @@ export default function ShareYourDay() {
                             <select
                                 required
                                 value={formData.mood}
-                                onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        mood: e.target.value as typeof formData.mood,
-                                    })
-                                }
+                                onChange={(e) => handleFieldChange('mood', e.target.value as typeof formData.mood)}
                                 className="w-full p-4 bg-background border border-foreground/30 text-foreground font-sans focus:border-foreground focus:outline-none"
                             >
                                 {[
@@ -197,12 +240,7 @@ export default function ShareYourDay() {
                             required
                             placeholder="e.g., 'Finally got that promotion' or 'Feeling overwhelmed but grateful'"
                             value={formData.title}
-                            onChange={(e) =>
-                                setFormData({
-                                    ...formData,
-                                    title: e.target.value,
-                                })
-                            }
+                            onChange={(e) => handleFieldChange('title', e.target.value)}
                             onFocus={() => setFocusedField('title')}
                             onBlur={() => setFocusedField(null)}
                             className="w-full p-4 bg-background border border-foreground/30 text-foreground font-sans placeholder-foreground/40 focus:border-foreground focus:outline-none"
@@ -224,12 +262,7 @@ export default function ShareYourDay() {
                             rows={6}
                             placeholder="Share what happened, how you felt, what made this day memorable or challenging. Be as detailed or brief as you'd like."
                             value={formData.description}
-                            onChange={(e) =>
-                                setFormData({
-                                    ...formData,
-                                    description: e.target.value,
-                                })
-                            }
+                            onChange={(e) => handleFieldChange('description', e.target.value)}
                             onFocus={() => setFocusedField('description')}
                             onBlur={() => setFocusedField(null)}
                             className="w-full p-4 bg-background border border-foreground/30 text-foreground font-sans placeholder-foreground/40 focus:border-foreground focus:outline-none resize-vertical"
@@ -250,12 +283,7 @@ export default function ShareYourDay() {
                             type="text"
                             placeholder="Separate with commas: morning coffee, work meeting, evening walk, phone call with friend"
                             value={formData.significantEvents}
-                            onChange={(e) =>
-                                setFormData({
-                                    ...formData,
-                                    significantEvents: e.target.value,
-                                })
-                            }
+                            onChange={(e) => handleFieldChange('significantEvents', e.target.value)}
                             onFocus={() => setFocusedField('events')}
                             onBlur={() => setFocusedField(null)}
                             className="w-full p-4 bg-background border border-foreground/30 text-foreground font-sans placeholder-foreground/40 focus:border-foreground focus:outline-none"
@@ -277,12 +305,7 @@ export default function ShareYourDay() {
                                 type="text"
                                 placeholder="e.g., Home, Office, Park, City center"
                                 value={formData.location}
-                                onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        location: e.target.value,
-                                    })
-                                }
+                                onChange={(e) => handleFieldChange('location', e.target.value)}
                                 className="w-full p-4 bg-background border border-foreground/30 text-foreground font-sans placeholder-foreground/40 focus:border-foreground focus:outline-none"
                             />
                         </div>
@@ -294,12 +317,7 @@ export default function ShareYourDay() {
                                 type="text"
                                 placeholder="e.g., Sunny, Rainy, Cloudy, Perfect"
                                 value={formData.weather}
-                                onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        weather: e.target.value,
-                                    })
-                                }
+                                onChange={(e) => handleFieldChange('weather', e.target.value)}
                                 className="w-full p-4 bg-background border border-foreground/30 text-foreground font-sans placeholder-foreground/40 focus:border-foreground focus:outline-none"
                             />
                         </div>
