@@ -36,17 +36,17 @@ export interface DBUser {
     post_count: number;
 }
 
-// SQL for creating tables (keeping the scehma saved here for reference):
-// This will prepare the database for the application, including user authentication and emotion tracking.
-
+// COMPLETE DATABASE SETUP SQL
+// Copy everything between the --- lines and run it in Supabase SQL editor
 
 /*
+---------------------------------------------------------------------------
 
-
--- Enable pgcrypto for UUID generation
+-- Enable necessary extensions
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- Create enum for regions
+DROP TYPE IF EXISTS user_region CASCADE;
 CREATE TYPE user_region AS ENUM (
     'North America', 'South America', 'Europe', 'Africa', 
     'Asia', 'Oceania', 'Middle East', 'Caribbean', 
@@ -54,6 +54,7 @@ CREATE TYPE user_region AS ENUM (
 );
 
 -- Create users table
+DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username TEXT UNIQUE NOT NULL,
@@ -62,10 +63,14 @@ CREATE TABLE users (
     last_login TIMESTAMPTZ DEFAULT NOW(),
     post_count INT DEFAULT 0,
     region user_region DEFAULT 'Unknown',
+    created_by TEXT DEFAULT CURRENT_USER,
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_by TEXT DEFAULT CURRENT_USER,
     CONSTRAINT username_length CHECK (char_length(username) >= 3)
 );
 
 -- Create emotions table
+DROP TABLE IF EXISTS emotions CASCADE;
 CREATE TABLE emotions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -78,6 +83,9 @@ CREATE TABLE emotions (
     significant_events TEXT[] DEFAULT '{}',
     weather TEXT,
     region user_region DEFAULT 'Unknown',
+    created_by TEXT DEFAULT CURRENT_USER,
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_by TEXT DEFAULT CURRENT_USER,
     
     CONSTRAINT title_length CHECK (char_length(title) >= 3),
     CONSTRAINT description_length CHECK (char_length(description) >= 10)
@@ -118,93 +126,33 @@ CREATE TRIGGER check_emotion_rate_limit
     FOR EACH ROW
     EXECUTE FUNCTION enforce_rate_limit();
 
--- Create index for faster queries
+-- Create indexes for faster queries
 CREATE INDEX idx_emotions_created_at ON emotions(created_at DESC);
 CREATE INDEX idx_emotions_username ON emotions(username);
 CREATE INDEX idx_emotions_region ON emotions(region);
+CREATE INDEX idx_users_username ON users(username);
 CREATE INDEX idx_users_region ON users(region);
 
+-- Create audit trigger function
+CREATE OR REPLACE FUNCTION update_audit_fields()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    NEW.updated_by = CURRENT_USER;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-*/
+-- Add audit triggers
+CREATE TRIGGER users_audit
+    BEFORE UPDATE ON users
+    FOR EACH ROW
+    EXECUTE FUNCTION update_audit_fields();
 
-
-
-// AND FOR ADDING RLS TO THE DATABASE:
-// WE TAKE THE FOLLOWING GIVEN APPROACH.
-
-
-/*
-
-
--- Enable Row Level Security
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE emotions ENABLE ROW LEVEL SECURITY;
-
--- Allow users to see their own profile only
-CREATE POLICY users_view_own ON users
-    FOR SELECT
-    USING (
-        auth.uid() = id
-        OR 
-        -- Allow fetching minimal user info for displaying posts
-        EXISTS (
-            SELECT 1 FROM emotions 
-            WHERE emotions.username = users.username
-        )
-    );
-
--- Allow users to update their own profile
-CREATE POLICY users_update_own ON users
-    FOR UPDATE
-    USING (auth.uid() = id);
-
--- Allow users to delete their own account
-CREATE POLICY users_delete_own ON users
-    FOR DELETE
-    USING (auth.uid() = id);
-
--- Emotions table policies
--- Anyone can view emotions (they're public)
-CREATE POLICY emotions_view_all ON emotions
-    FOR SELECT
-    TO authenticated
-    USING (true);
-
--- Users can only insert their own emotions
-CREATE POLICY emotions_insert_own ON emotions
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (
-        username = (
-            SELECT username 
-            FROM users 
-            WHERE id = auth.uid()
-        )
-    );
-
--- Users can only update their own emotions
-CREATE POLICY emotions_update_own ON emotions
-    FOR UPDATE
-    TO authenticated
-    USING (
-        username = (
-            SELECT username 
-            FROM users 
-            WHERE id = auth.uid()
-        )
-    );
-
--- Users can only delete their own emotions
-CREATE POLICY emotions_delete_own ON emotions
-    FOR DELETE
-    TO authenticated
-    USING (
-        username = (
-            SELECT username 
-            FROM users 
-            WHERE id = auth.uid()
-        )
-    );
+CREATE TRIGGER emotions_audit
+    BEFORE UPDATE ON emotions
+    FOR EACH ROW
+    EXECUTE FUNCTION update_audit_fields();
 
 -- Prevent users from changing their username if they have existing posts
 CREATE OR REPLACE FUNCTION check_username_change()
@@ -224,6 +172,104 @@ CREATE TRIGGER prevent_username_change
     FOR EACH ROW
     EXECUTE FUNCTION check_username_change();
 
+-- Enable Row Level Security
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE emotions ENABLE ROW LEVEL SECURITY;
 
-    
+-- Allow service role to bypass RLS for users table
+ALTER TABLE users FORCE ROW LEVEL SECURITY;
+
+-- User table policies
+-- Allow authenticated users to see their own data
+CREATE POLICY "Users can view own profile" ON users
+    FOR SELECT
+    USING (
+        auth.role() = 'authenticated' 
+        AND auth.uid()::text = id::text
+    );
+
+-- Allow authenticated users to update their own data
+CREATE POLICY "Users can update own profile" ON users
+    FOR UPDATE
+    USING (
+        auth.role() = 'authenticated' 
+        AND auth.uid()::text = id::text
+    )
+    WITH CHECK (
+        auth.role() = 'authenticated' 
+        AND auth.uid()::text = id::text
+    );
+
+-- Service role has full access
+CREATE POLICY "Service role has full access" ON users
+    FOR ALL
+    USING (auth.role() = 'service_role')
+    WITH CHECK (auth.role() = 'service_role');
+
+-- Emotions table policies
+CREATE POLICY "Users can view all emotions" ON emotions
+    FOR SELECT
+    USING (true);
+
+-- Helper function to get the current user's username from JWT
+CREATE OR REPLACE FUNCTION get_jwt_username()
+RETURNS TEXT AS $$
+BEGIN
+    RETURN current_setting('request.jwt.claims', true)::json->>'username';
+EXCEPTION
+    WHEN OTHERS THEN RETURN NULL;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Helper function to check if a user owns a username
+CREATE OR REPLACE FUNCTION is_username_owner(check_username TEXT)
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1 FROM users
+        WHERE id::text = auth.uid()::text
+        AND username = check_username
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE POLICY "Users can create own emotions" ON emotions
+    FOR INSERT
+    WITH CHECK (is_username_owner(username));
+
+CREATE POLICY "Users can update own emotions" ON emotions
+    FOR UPDATE
+    USING (is_username_owner(username))
+    WITH CHECK (is_username_owner(username));
+
+CREATE POLICY "Users can delete own emotions" ON emotions
+    FOR DELETE
+    USING (is_username_owner(username));
+
+-- Grant necessary permissions to authenticated users
+GRANT USAGE ON SCHEMA public TO authenticated;
+GRANT ALL ON users TO authenticated;
+GRANT ALL ON emotions TO authenticated;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+
+-- Secure the schema
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM anon;
+REVOKE ALL ON ALL FUNCTIONS IN SCHEMA public FROM anon;
+REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM anon;
+
+
+-- Create function to increment post count
+CREATE OR REPLACE FUNCTION increment_post_count(user_name text)
+RETURNS void AS $$
+BEGIN
+    UPDATE users
+    SET post_count = post_count + 1
+    WHERE username = user_name;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+
+---------------------------------------------------------------------------
 */
