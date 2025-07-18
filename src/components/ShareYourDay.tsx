@@ -77,7 +77,7 @@ export default function ShareYourDay() {
                         </div>
                     </div>
                 ), {
-                    duration: 8000,
+                    duration: 10000,
                 });
             }
         }
