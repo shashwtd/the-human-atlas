@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { dummyEmotions } from "@/data/emotions";
 import EmotionDisplay from "@/components/EmotionDisplay";
 import ShareYourDay from "@/components/ShareYourDay";
 
@@ -54,7 +53,7 @@ export default function Home() {
                                     : "bg-transparent text-foreground hover:bg-foreground/10 border-r border-foreground/30"
                             }`}
                         >
-                            EXPLORE EMOTIONS [{dummyEmotions.length}]
+                            EXPLORE EMOTIONS
                         </button>
                         <button
                             onClick={() => setActiveTab("share")}
@@ -72,7 +71,7 @@ export default function Home() {
 
             {/* Content Sections */}
             {activeTab === "explore" && (
-                <EmotionDisplay emotions={dummyEmotions} />
+                <EmotionDisplay emotions={[]} />
             )}
             {activeTab === "share" && <ShareYourDay />}
 
