@@ -5,8 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { Region } from "@/types/database";
 import toast from "react-hot-toast";
 import { emotionCategories } from "@/data/emotions";
-import { TagsInput } from "react-tag-input-component";
-import "./tag-input.css";
+import TagInput from "./TagInput";
 
 export default function ShareYourDay() {
     const { user } = useAuth();
@@ -303,25 +302,15 @@ export default function ShareYourDay() {
                             }}
                             tabIndex={-1}
                         >
-                            <TagsInput
-                                value={formData.significantEvents}
-                                onChange={(tags) => {
-                                    if (tags.length <= 4) {
-                                        handleFieldChange('significantEvents', tags);
-                                    } else {
-                                        toast.error("Maximum 4 key moments allowed");
-                                    }
+                            <TagInput
+                                tags={formData.significantEvents}
+                                onChange={(tags: string[]) => {
+                                    handleFieldChange('significantEvents', tags);
                                 }}
-                                beforeAddValidate={(tag, existingTags) => {
-                                    if (existingTags.length >= 4) {
-                                        toast.error("Maximum 4 key moments allowed");
-                                        return false;
-                                    }
-                                    return true;
-                                }}
-                                name="significantEvents"
-                                placeHolder="Type and press enter to add a moment"
-                                separators={["Enter"]}
+                                maxTags={4}
+                                placeholder="Type and press enter to add a moment"
+                                onFocus={() => setFocusedField('events')}
+                                onBlur={() => setFocusedField(null)}
                             />
                             {focusedField === 'events' && (
                                 <p className="mt-2 text-xs text-foreground/60 font-mono">
