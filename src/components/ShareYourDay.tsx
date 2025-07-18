@@ -5,6 +5,8 @@ import { useAuth } from "@/lib/auth";
 import { Region } from "@/types/database";
 import toast from "react-hot-toast";
 import { emotionCategories } from "@/data/emotions";
+import { TagsInput } from "react-tag-input-component";
+import "./tag-input.css";
 
 export default function ShareYourDay() {
     const { user } = useAuth();
@@ -17,7 +19,16 @@ export default function ShareYourDay() {
             const saved = localStorage.getItem('savedStoryDraft');
             if (saved) {
                 try {
-                    return JSON.parse(saved);
+                    const parsedData = JSON.parse(saved);
+                    // Ensure significantEvents is always an array
+                    return {
+                        ...parsedData,
+                        significantEvents: Array.isArray(parsedData.significantEvents) 
+                            ? parsedData.significantEvents.map((event: string | { text: string } | unknown) => 
+                                typeof event === 'string' ? event : typeof event === 'object' && event && 'text' in event ? event.text : ''
+                            )
+                            : []
+                    };
                 } catch (e) {
                     console.error('Failed to parse saved story draft', e);
                 }
@@ -28,7 +39,7 @@ export default function ShareYourDay() {
             primaryEmotion: "",
             title: "",
             description: "",
-            significantEvents: "",
+            significantEvents: [] as string[],
             location: "",
             weather: "",
             mood: "neutral" as
@@ -51,7 +62,7 @@ export default function ShareYourDay() {
     }, [formData, hasInteracted]);
 
     // Function to handle any form field change
-    const handleFieldChange = (field: string, value: string | number | boolean) => {
+    const handleFieldChange = (field: string, value: string | number | boolean | string[]) => {
         if (!hasInteracted) {
             setHasInteracted(true);
             if (!user) {
@@ -94,13 +105,8 @@ export default function ShareYourDay() {
         try {
             setIsSubmitting(true);
 
-            // Validate significant events
-            const eventsList = formData.significantEvents
-                ? formData.significantEvents
-                      .split("\n")
-                      .map((event: string) => event.trim())
-                      .filter((event: string) => event.length > 0)
-                : [];
+            // Get events list directly as it's already in string format
+            const eventsList = formData.significantEvents;
 
             const response = await fetch('/api/emotions', {
                 method: 'POST',
@@ -132,7 +138,7 @@ export default function ShareYourDay() {
                 primaryEmotion: "",
                 title: "",
                 description: "",
-                significantEvents: "",
+                significantEvents: [] as { id: string; text: string }[],
                 location: "",
                 mood: "neutral",
                 weather: "",
@@ -277,22 +283,52 @@ export default function ShareYourDay() {
                     {/* Significant Events */}
                     <div>
                         <label className="block font-mono text-sm font-semibold text-foreground/80 mb-3">
-                            KEY MOMENTS (OPTIONAL)
+                            KEY MOMENTS
                         </label>
-                        <input
-                            type="text"
-                            placeholder="Separate with commas: morning coffee, work meeting, evening walk, phone call with friend"
-                            value={formData.significantEvents}
-                            onChange={(e) => handleFieldChange('significantEvents', e.target.value)}
+                        <div 
+                            className="tag-input-wrapper"
+                            onClick={(e) => {
+                                const container = e.currentTarget;
+                                const input = container.querySelector('.rti--input') as HTMLInputElement;
+                                if (input) {
+                                    input.focus();
+                                    setFocusedField('events');
+                                }
+                            }}
                             onFocus={() => setFocusedField('events')}
-                            onBlur={() => setFocusedField(null)}
-                            className="w-full p-4 bg-background border border-foreground/30 text-foreground font-sans placeholder-foreground/40 focus:border-foreground focus:outline-none"
-                        />
-                        {focusedField === 'events' && (
-                            <p className="mt-2 text-sm text-foreground/60 font-mono">
-                                List notable moments from your day, separated by commas. These will be displayed as tags.
-                            </p>
-                        )}
+                            onBlur={(e) => {
+                                if (!e.currentTarget.contains(e.relatedTarget)) {
+                                    setFocusedField(null);
+                                }
+                            }}
+                            tabIndex={-1}
+                        >
+                            <TagsInput
+                                value={formData.significantEvents}
+                                onChange={(tags) => {
+                                    if (tags.length <= 4) {
+                                        handleFieldChange('significantEvents', tags);
+                                    } else {
+                                        toast.error("Maximum 4 key moments allowed");
+                                    }
+                                }}
+                                beforeAddValidate={(tag, existingTags) => {
+                                    if (existingTags.length >= 4) {
+                                        toast.error("Maximum 4 key moments allowed");
+                                        return false;
+                                    }
+                                    return true;
+                                }}
+                                name="significantEvents"
+                                placeHolder="Type and press enter to add a moment"
+                                separators={["Enter"]}
+                            />
+                            {focusedField === 'events' && (
+                                <p className="mt-2 text-xs text-foreground/60 font-mono">
+                                    Press enter after typing to add a key moment • {formData.significantEvents.length}/4 moments added
+                                </p>
+                            )}
+                        </div>
                     </div>
 
                     {/* Location & Weather */}

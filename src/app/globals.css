@@ -3,6 +3,7 @@
 :root {
     /* Base Theme Colors */
     --background: #38342d;
+    --bg-neutral-900: #171717;
     --foreground: #cfb885;
 
     /* Color Variations */

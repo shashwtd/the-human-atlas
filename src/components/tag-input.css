@@ -1,0 +1,54 @@
+.rti--container {
+    --rti-bg: var(--background) !important;
+    --rti-border: var(--border-primary) !important;
+    --rti-main: var(--foreground) !important;
+    --rti-radius: 0px !important;
+    --rti-s: 0.5rem !important;
+    --rti-tag: var(--background) !important;
+    --rti-tag-remove: var(--foreground) !important;
+    padding: 1rem !important;
+    cursor: text !important;
+    min-height: 64px !important;
+}
+
+.tag-input-wrapper {
+    outline: none;
+}
+
+.tag-input-wrapper:focus-within .rti--container {
+    border: 1px var(--foreground) !important;
+}
+
+.rti--tag {
+    background: #202020 !important;
+    border: 1px solid var(--border-primary) !important;
+    color: var(--foreground) !important;
+    font-family: var(--font-mono) !important;
+    font-size: 1rem !important;
+    transition: all 0.2s !important;
+    padding: 0.35rem 0.35rem 0.35rem 0.75rem !important;
+}
+
+.rti--tag:hover {
+    background: var(--foreground/10) !important;
+}
+
+.rti--input {
+    font-family: var(--font-sans) !important;
+    color: var(--foreground) !important;
+    background: transparent !important;
+    min-width: 200px !important;
+}
+
+.rti--input::placeholder {
+    color: var(--foreground/40) !important;
+}
+
+.rti--tag button {
+    color: var(--foreground/40) !important;
+    transition: color 0.2s !important;
+}
+
+.rti--tag button:hover {
+    color: var(--foreground) !important;
+}
