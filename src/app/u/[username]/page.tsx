@@ -12,6 +12,10 @@ interface UserStats {
     mostFrequentDay: string;
     recentEmotions: {
         emotion: string;
+        title: string;
+        description: string;
+        day_rating: number;
+        mood: string;
         created_at: string;
         location_name: string;
     }[];
@@ -221,18 +225,54 @@ export default function UserProfile() {
                                 <div className="absolute left-0 w-px h-full bg-foreground/20 group-last:h-0" />
                                 <div className="absolute left-0 w-2 h-2 -translate-x-[3px] translate-y-2 bg-foreground/40 group-hover:bg-foreground transition-colors duration-200" />
                                 <div className="ml-6 p-4 border border-foreground/20 bg-neutral-900 hover:bg-neutral-800/50 transition-colors duration-200">
-                                    <div className="flex items-start justify-between gap-4">
-                                        <div>
-                                            <div className="font-mono text-foreground/80 mb-1">
-                                                {emotion.emotion}
+                                    <div className="flex flex-col gap-4">
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div>
+                                                <div className="font-mono text-foreground/80 mb-1">
+                                                    {emotion.emotion}
+                                                </div>
+                                                <div className="font-mono text-xs text-foreground/40">
+                                                    {emotion.location_name}
+                                                </div>
                                             </div>
-                                            <div className="font-mono text-xs text-foreground/40">
-                                                {emotion.location_name}
+                                            <div className="font-mono text-sm text-foreground/40">
+                                                {emotion.created_at}
                                             </div>
                                         </div>
-                                        <div className="font-mono text-sm text-foreground/40">
-                                            {emotion.created_at}
-                                        </div>
+                                        
+                                        {/* Title and Mood */}
+                                        {(emotion.title || emotion.mood) && (
+                                            <div className="border-t border-foreground/10 pt-4">
+                                                {emotion.title && (
+                                                    <div className="font-mono text-foreground mb-2">
+                                                        {emotion.title}
+                                                    </div>
+                                                )}
+                                                {emotion.mood && (
+                                                    <div className="font-mono text-sm text-foreground/60">
+                                                        Mood: {emotion.mood}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                        
+                                        {/* Description */}
+                                        {emotion.description && (
+                                            <div className="border-t border-foreground/10 pt-4">
+                                                <div className="font-mono text-sm text-foreground/80 whitespace-pre-wrap">
+                                                    {emotion.description}
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {/* Day Rating */}
+                                        {emotion.day_rating && (
+                                            <div className="border-t border-foreground/10 pt-4">
+                                                <div className="font-mono text-xs text-foreground/40">
+                                                    Day Rating: {emotion.day_rating}/10
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

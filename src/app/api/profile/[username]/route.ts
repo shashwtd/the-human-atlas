@@ -57,9 +57,12 @@ export async function GET(
       mostFrequentDay: getMostFrequentDay(emotions.map(e => new Date(e.created_at))),
       recentEmotions: emotions
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-        .slice(0, 5)
         .map(e => ({
           emotion: e.primary_emotion,
+          title: e.title,
+          description: e.description,
+          day_rating: e.day_rating,
+          mood: e.mood,
           created_at: new Date(e.created_at).toLocaleDateString(),
           location_name: e.region || "Unknown Location"
         })),
