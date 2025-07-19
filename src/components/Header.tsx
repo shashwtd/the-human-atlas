@@ -3,27 +3,28 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth";
-import { 
-    LogIn, 
-    LogOut, 
-    User, 
-    Menu, 
-    X, 
-    UserCircle, 
-    Globe2, 
-    Clock, 
-    BarChart3, 
-    Info, 
-    HelpCircle,
+import {
+    LogIn,
+    LogOut,
+    User,
+    Menu,
+    X,
+    UserCircle,
+    Globe2,
+    Clock,
+    BarChart3,
     Pencil,
-    ChevronDown
+    ChevronDown,
+    BookOpen,
+    FileText,
+    Zap
 } from "lucide-react";
 import NavDropdown from "./NavDropdown";
 
 export default function Header() {
     const { user, signOut } = useAuth();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [activeSection, setActiveSection] = useState<'about' | 'explore' | null>(null);
+    const [activeSection, setActiveSection] = useState<'about' | 'explore' | 'profile' | null>(null);
 
     return (
         <header className="fixed w-screen h-max px-2 py-2 bg-neutral-900 z-50">
@@ -43,20 +44,21 @@ export default function Header() {
                 <nav className="hidden md:flex items-center h-full">
                     <NavDropdown
                         label="About"
-                        icon={<Info size={14} />}
+                        icon={<BookOpen size={14} />}
                         items={[
                             {
                                 label: "About Project",
                                 href: "/about-project",
-                                icon: <Info size={14} />
+                                icon: <FileText size={14} />
                             },
                             {
                                 label: "How it works",
                                 href: "/how-it-works",
-                                icon: <HelpCircle size={14} />
+                                icon: <Zap size={14} />
                             }
                         ]}
                     />
+                    {/* Temporarily disabled dropdown until we have more content
                     <NavDropdown
                         label="Explore"
                         icon={<Globe2 size={14} />}
@@ -78,6 +80,14 @@ export default function Header() {
                             }
                         ]}
                     />
+                    */}
+                    <Link
+                        href="/explore"
+                        className="text-black font-mono font-medium px-5 h-full items-center flex hover:text-foreground hover:bg-background hover:border hover:border-foreground border-x"
+                    >
+                        <Globe2 size={14} className="mr-2" />
+                        Explore
+                    </Link>
                     <Link
                         href="/record"
                         className="text-black font-mono font-medium px-5 h-full items-center flex hover:text-foreground hover:bg-background hover:border hover:border-foreground border-x"
@@ -124,15 +134,25 @@ export default function Header() {
 
             {/* Mobile Navigation Overlay */}
             {isMobileMenuOpen && (
-                <div className="md:hidden absolute top-[calc(0.5rem+2rem)] left-2 right-2 border border-black bg-neutral-900">
-                    <nav className="flex flex-col w-full">
+                <div className="md:hidden absolute top-[calc(0.5rem+2rem)] left-2 right-2">
+                    <nav className="flex flex-col w-full bg-foreground border border-black">
+                        {/* Main Navigation */}
+                        <Link
+                            href="/record"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="text-black font-mono font-medium px-5 py-3 flex items-center border-b border-black hover:text-foreground hover:bg-background hover:border hover:border-foreground"
+                        >
+                            <Pencil size={14} className="mr-2" />
+                            Record
+                        </Link>
+
                         {/* About Section */}
                         <button 
                             onClick={() => setActiveSection(activeSection === 'about' ? null : 'about')}
-                            className="text-foreground cursor-pointer font-mono font-medium px-5 py-3 flex items-center justify-between border-b border-neutral-700 hover:bg-neutral-800"
+                            className="text-black cursor-pointer font-mono font-medium px-5 py-3 flex items-center justify-between border-b border-black hover:text-foreground hover:bg-background hover:border hover:border-foreground"
                         >
                             <span className="flex items-center">
-                                <Info size={14} className="mr-2" />
+                                <BookOpen size={14} className="mr-2" />
                                 About
                             </span>
                             <ChevronDown 
@@ -141,30 +161,30 @@ export default function Header() {
                             />
                         </button>
                         {activeSection === 'about' && (
-                            <>
+                            <div className="bg-foreground border-b border-black">
                                 <Link
                                     href="/about-project"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="text-foreground font-mono font-medium px-8 py-3 flex items-center bg-neutral-800 border-b border-neutral-700 hover:bg-neutral-700"
+                                    className="text-black font-mono font-medium pl-10 pr-5 py-3 flex items-center border-b border-black hover:text-foreground hover:bg-background hover:border hover:border-foreground"
                                 >
-                                    <Info size={14} className="mr-2" />
+                                    <FileText size={14} className="mr-2" />
                                     About Project
                                 </Link>
                                 <Link
                                     href="/how-it-works"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="text-foreground font-mono font-medium px-8 py-3 flex items-center bg-neutral-800 border-b border-neutral-700 hover:bg-neutral-700"
+                                    className="text-black font-mono font-medium pl-10 pr-5 py-3 flex items-center hover:text-foreground hover:bg-background hover:border hover:border-foreground"
                                 >
-                                    <HelpCircle size={14} className="mr-2" />
+                                    <Zap size={14} className="mr-2" />
                                     How it works
                                 </Link>
-                            </>
+                            </div>
                         )}
 
                         {/* Explore Section */}
                         <button 
                             onClick={() => setActiveSection(activeSection === 'explore' ? null : 'explore')}
-                            className="text-foreground cursor-pointer font-mono font-medium px-5 py-3 flex items-center justify-between border-b border-neutral-700 hover:bg-neutral-800"
+                            className="text-black cursor-pointer font-mono font-medium px-5 py-3 flex items-center justify-between border-b border-black hover:text-foreground hover:bg-background hover:border hover:border-foreground"
                         >
                             <span className="flex items-center">
                                 <Globe2 size={14} className="mr-2" />
@@ -176,11 +196,11 @@ export default function Header() {
                             />
                         </button>
                         {activeSection === 'explore' && (
-                            <>
+                            <div className="bg-foreground border-b border-black">
                                 <Link
                                     href="/explore"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="text-foreground font-mono font-medium px-8 py-3 flex items-center bg-neutral-800 border-b border-neutral-700 hover:bg-neutral-700"
+                                    className="text-black font-mono font-medium pl-10 pr-5 py-3 flex items-center border-b border-black hover:text-foreground hover:bg-background hover:border hover:border-foreground"
                                 >
                                     <Globe2 size={14} className="mr-2" />
                                     Global Map
@@ -188,7 +208,7 @@ export default function Header() {
                                 <Link
                                     href="/timeline"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="text-foreground font-mono font-medium px-8 py-3 flex items-center bg-neutral-800 border-b border-neutral-700 hover:bg-neutral-700"
+                                    className="text-black font-mono font-medium pl-10 pr-5 py-3 flex items-center border-b border-black hover:text-foreground hover:bg-background hover:border hover:border-foreground"
                                 >
                                     <Clock size={14} className="mr-2" />
                                     Timeline
@@ -196,40 +216,50 @@ export default function Header() {
                                 <Link
                                     href="/statistics"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="text-foreground font-mono font-medium px-8 py-3 flex items-center bg-neutral-800 border-b border-neutral-700 hover:bg-neutral-700"
+                                    className="text-black font-mono font-medium pl-10 pr-5 py-3 flex items-center hover:text-foreground hover:bg-background hover:border hover:border-foreground"
                                 >
                                     <BarChart3 size={14} className="mr-2" />
                                     Statistics
                                 </Link>
-                            </>
+                            </div>
                         )}
 
-                        {/* Record Section */}
-                        <Link
-                            href="/record"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="text-foreground font-mono font-medium px-5 py-3 flex items-center border-b border-neutral-700 hover:bg-neutral-800"
-                        >
-                            <Pencil size={14} className="mr-2" />
-                            Record
-                        </Link>
-
+                        {/* User Section */}
                         {user ? (
                             <>
-                                <div className="text-black font-mono font-medium px-5 py-3 flex items-center border-b border-black">
-                                    <User size={14} className="mr-2" />
-                                    {user.username}
-                                </div>
-                                <button
-                                    onClick={() => {
-                                        signOut();
-                                        setIsMobileMenuOpen(false);
-                                    }}
-                                    className="text-black font-mono font-medium px-5 py-3 flex items-center hover:text-foreground hover:bg-background hover:border hover:border-foreground"
+                                <button 
+                                    onClick={() => setActiveSection(activeSection === 'profile' ? null : 'profile')}
+                                    className="text-black cursor-pointer font-mono font-medium px-5 py-3 flex items-center justify-between border-b border-black hover:text-foreground hover:bg-background hover:border hover:border-foreground"
                                 >
-                                    <LogOut size={14} className="mr-2" />
-                                    Sign out
+                                    <span className="flex items-center">
+                                        <User size={14} className="mr-2" />
+                                        {user.username}
+                                    </span>
+                                    <ChevronDown 
+                                        size={14} 
+                                        className={`transition-transform duration-200 ${activeSection === 'profile' ? 'rotate-180' : ''}`}
+                                    />
                                 </button>
+                                {activeSection === 'profile' && (
+                                    <div className="bg-foreground">
+                                        <Link
+                                            href={`/u/${user.username}`}
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="text-black font-mono font-medium pl-8 pr-5 py-3 flex items-center border-b border-black hover:text-foreground hover:bg-background hover:border hover:border-foreground"
+                                        >
+                                            Profile
+                                        </Link>
+                                        <button
+                                            onClick={() => {
+                                                setIsMobileMenuOpen(false);
+                                                signOut();
+                                            }}
+                                            className="w-full text-black font-mono font-medium pl-8 pr-5 py-3 flex items-center hover:text-foreground hover:bg-background hover:border hover:border-foreground"
+                                        >
+                                            Sign out
+                                        </button>
+                                    </div>
+                                )}
                             </>
                         ) : (
                             <Link
