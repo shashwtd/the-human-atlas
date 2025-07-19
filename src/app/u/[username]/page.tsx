@@ -124,10 +124,9 @@ export default function UserProfile() {
         <div className="min-h-screen bg-neutral-900 pt-20">
             {/* Noise overlay */}
             <div
-                className="fixed inset-0 opacity-5"
+                className="fixed pointer-events-none inset-0 opacity-5"
                 style={{
                     backgroundImage: 'url("/noise.webp")',
-                    animation: "noise 0.5s steps(2) infinite",
                 }}
             />
 
@@ -305,39 +304,6 @@ export default function UserProfile() {
                     }
                 }
 
-                @keyframes noise {
-                    0%,
-                    100% {
-                        transform: translate(0, 0);
-                    }
-                    10% {
-                        transform: translate(-5%, -5%);
-                    }
-                    20% {
-                        transform: translate(-10%, 5%);
-                    }
-                    30% {
-                        transform: translate(5%, -10%);
-                    }
-                    40% {
-                        transform: translate(-5%, 15%);
-                    }
-                    50% {
-                        transform: translate(-10%, 5%);
-                    }
-                    60% {
-                        transform: translate(15%, 0);
-                    }
-                    70% {
-                        transform: translate(0, 10%);
-                    }
-                    80% {
-                        transform: translate(-15%, 0);
-                    }
-                    90% {
-                        transform: translate(10%, 5%);
-                    }
-                }
             `}</style>
         </div>
     );
