@@ -3,7 +3,6 @@
 import ShareYourDay from "@/components/ShareYourDay";
 import { useAuth } from "@/lib/auth";
 import { LogIn } from "lucide-react";
-import Image from "next/image";
 
 export default function RecordPage() {
     const { user } = useAuth();

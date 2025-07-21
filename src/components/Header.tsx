@@ -65,7 +65,7 @@ export default function Header() {
                         items={[
                             {
                                 label: "Global Map",
-                                href: "/explore",
+                                href: "/emotions",
                                 icon: <Globe2 size={14} />
                             },
                             {
@@ -82,7 +82,7 @@ export default function Header() {
                     />
                     */}
                     <Link
-                        href="/explore"
+                        href="/emotions"
                         className="text-black font-mono font-medium px-5 h-full items-center flex hover:text-foreground hover:bg-background hover:border hover:border-foreground border-x"
                     >
                         <Globe2 size={14} className="mr-2" />
@@ -198,7 +198,7 @@ export default function Header() {
                         {activeSection === 'explore' && (
                             <div className="bg-foreground border-b border-black">
                                 <Link
-                                    href="/explore"
+                                    href="/emotions"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                     className="text-black font-mono font-medium pl-10 pr-5 py-3 flex items-center border-b border-black hover:text-foreground hover:bg-background hover:border hover:border-foreground"
                                 >
