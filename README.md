@@ -1,29 +1,31 @@
 # 💟 THE HUMAN ATLAS
 
-**THE HUMAN ATLAS** is a digital library consisting of books that have their own emotion. Users can log their entries and they get processed through local LLMs that categorize the emotion they emit and then the entries are logged into the database. It's an interactive environment where you could browse various books and read them.
+**THE HUMAN ATLAS** is a collective library of human emotions - a private, anonymous space where people can map their emotional landscape, share their daily experiences, and explore the universal human condition through authentic stories.
 
-## 🚀 Features
+## 🌟 Key Features
 
-- TBA
+- **Anonymous Sharing**: A safe, private space to express your feelings and reflect on your day
+- **Emotion Exploration**: Browse and connect with others through shared emotional experiences
+- **Daily Reflections**: Share your day and contribute to the collective emotional landscape
+- **Privacy First**: No personal data collection or storage
 
-<div align="">
-  <a href="https://shipwrecked.hackclub.com/?t=ghrm" target="_blank">
-    <img src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/739361f1d440b17fc9e2f74e49fc185d86cbec14_badge.png" 
-         alt="This project is part of Shipwrecked, the world's first hackathon on an island!" 
-         style="width: 35%;">
-  </a>
-</div>
+[![Shipwrecked Hackathon](https://hc-cdn.hel1.your-objectstorage.com/s/v3/739361f1d440b17fc9e2f74e49fc185d86cbec14_badge.png)](https://shipwrecked.hackclub.com/?t=ghrm)
+
+## 📱 Screenshots
+
+| Explore | Record | Insights |
+|---------|---------|----------|
+| ![Explore View](public/screenshots/explore.png) | ![Record View](public/screenshots/record.png) | ![Insights View](public/screenshots/insights.png) |
 
 ## 🛠️ Tech Stack
 
-- [Next.js](https://nextjs.org/)
-- [TailwindCSS](https://tailwindcss.com/)
-- [Gemini](https://ai.google.dev)
-- [Supabase](https://supabase.com)
+- [Next.js](https://nextjs.org/) - React framework for production
+- [TailwindCSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [Supabase](https://supabase.com) - Open source Firebase alternative
 
 ## 🧑‍💻 Local Setup Instructions
 
-> Ensure you have Node.js and pnpm/yarn/npm installed.
+1. Ensure you have Node.js and pnpm/yarn/npm installed.
 
 ```bash
 # Clone the repository
@@ -35,15 +37,10 @@ pnpm install
 
 # Run the dev server
 pnpm dev
+```
 
-# Open in browser
-http://localhost:3000
+1. Open [http://localhost:3000](http://localhost:3000) in your browser
 
+## 🤝 Contributing
 
-
-## Inspirations / Resources
-
-**For 3d book flip animation**
-- https://dearflip.com
-- https://real3dflipbook.com/#style_16
-- https://3dflipbook.net
+Contributions are welcome! Please feel free to submit a Pull Request.
