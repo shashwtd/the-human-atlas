@@ -19,6 +19,17 @@ import {
   Sparkles,
   CloudDrizzle,
   Sunrise,
+  Coffee,
+  Brain,
+  Flame,
+  Battery,
+  Star,
+  Cloud,
+  BatteryCharging,
+  Meh,
+  Music,
+  PartyPopper,
+  MehIcon as FaceNeutral,
 } from "lucide-react";
 
 export const emotionIcons: { [key: string]: LucideIcon } = {
@@ -42,4 +53,15 @@ export const emotionIcons: { [key: string]: LucideIcon } = {
   Inspired: Sparkles,
   Melancholy: Frown,
   Euphoric: SmilePlus,
+  Energetic: Flame,
+  Tired: Battery,
+  Proud: Star,
+  Nostalgic: Cloud,
+  Motivated: BatteryCharging,
+  Curious: Brain,
+  Relaxed: Coffee,
+  Playful: PartyPopper,
+  Indifferent: Meh,
+  Creative: Music,
+  Underwhelmed: FaceNeutral, 
 };
